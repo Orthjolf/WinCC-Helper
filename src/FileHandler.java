@@ -93,6 +93,7 @@ public class FileHandler {
 	public boolean deleteFile(String filePath) {
 		System.out.println(filePath + " удален");
 		File file = new File(filePath);
+		MainPanel.log.append(filePath + " удален\n");
 		if (file.exists()) {
 			file.delete();
 		}

@@ -194,7 +194,6 @@ public class MainPanel extends JPanel {
 					if (oldChangedFiles.get(i).checked) {
 						// Перемещаем
 						fileHandler.deleteFile(oldChangedFiles.get(i).getPath());
-						log.append(oldChangedFiles.get(i).getPath()+" удален");
 					}
 				searchForNewerFiles();
 				
