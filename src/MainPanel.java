@@ -77,7 +77,7 @@ public class MainPanel extends JPanel {
 		setProjPathButton = new JButton("Указать путь к проекту");
 		setProjPathButton.setFont(btnFont);
 		setProjPathButton.setFocusable(false);
-		topPanel.add(setProjPathButton);
+		topPanel.add(setProjPathButton, BorderLayout.CENTER);
 		setProjPathButton.addActionListener(setProjectPathListener);
 
 		replaceButton = new JButton("Заменить файлы");
@@ -193,9 +193,11 @@ public class MainPanel extends JPanel {
 					// Если выбран файл из списка
 					if (oldChangedFiles.get(i).checked) {
 						// Перемещаем
-						fileHandler.deleteFile(oldChangedFiles.get(i).oldVersionFilePath);
+						fileHandler.deleteFile(oldChangedFiles.get(i).getPath());
+						log.append(oldChangedFiles.get(i).getPath()+" удален");
 					}
 				searchForNewerFiles();
+				
 				log(log);
 			}
 		}

@@ -18,7 +18,7 @@ public class FileHandler {
 		ArrayList<ChangedFile> listOfNewestFiles = new ArrayList<ChangedFile>();
 		absolutePathLen = directory.length(); // длина пути к проекту
 		File spFile, // Файл из подпроекта
-			 pFile; // Файл из проекта
+				pFile; // Файл из проекта
 
 		// Записываем все файлы из проекта в listOfChangedFiles
 		for (String folder : folders)
@@ -91,6 +91,11 @@ public class FileHandler {
 	}
 
 	public boolean deleteFile(String filePath) {
+		System.out.println(filePath + " удален");
+		File file = new File(filePath);
+		if (file.exists()) {
+			file.delete();
+		}
 		return true;
 	}
 }
