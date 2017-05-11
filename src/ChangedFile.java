@@ -13,7 +13,7 @@ public class ChangedFile extends JPanel {
 	private static final long serialVersionUID = 1L;
 	boolean checked = false;
 	String path = "";
-	public String oldCopyPath = "";
+	public String oldVersionFilePath = "";
 	JCheckBox check = new JCheckBox();
 	JLabel label, date;
 	long lastModifiedDate;

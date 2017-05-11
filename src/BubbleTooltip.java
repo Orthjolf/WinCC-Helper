@@ -1,8 +1,6 @@
 import java.awt.BorderLayout;
 import java.awt.Dimension;
 import java.awt.Toolkit;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.sql.Date;
 import java.util.Timer;
 import java.util.TimerTask;
@@ -12,13 +10,12 @@ import javax.swing.JPanel;
 import javax.swing.border.EtchedBorder;
 import javax.swing.border.TitledBorder;
 
-public class BubbleTooltip extends JDialog implements ActionListener {
+public class BubbleTooltip extends JDialog {
 
 	private static final long serialVersionUID = 1L;
 	int WIDTH = 300;
 	int HEIGHT = 80;
-
-	int interval = 3000; // 2 sec
+	int interval = 4000; // 4 sec
 	Timer timer = new Timer();
 	JPanel content = new JPanel();
 
@@ -55,11 +52,5 @@ public class BubbleTooltip extends JDialog implements ActionListener {
 		for (String path : paths) {
 			content.add(new JLabel(path), BorderLayout.AFTER_LAST_LINE);
 		}
-	}
-
-	@Override
-	public void actionPerformed(ActionEvent e) {
-		// TODO Auto-generated method stub
-
 	}
 }

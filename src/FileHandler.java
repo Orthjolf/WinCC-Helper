@@ -18,7 +18,7 @@ public class FileHandler {
 		ArrayList<ChangedFile> listOfNewestFiles = new ArrayList<ChangedFile>();
 		absolutePathLen = directory.length(); // длина пути к проекту
 		File spFile, // Файл из подпроекта
-				pFile; // Файл из проекта
+			 pFile; // Файл из проекта
 
 		// Записываем все файлы из проекта в listOfChangedFiles
 		for (String folder : folders)
@@ -40,7 +40,7 @@ public class FileHandler {
 						// Заносим в массив, который будем возвращать
 						ChangedFile cf = new ChangedFile(pFile.getPath(), pFile.lastModified());
 						listOfNewestFiles.add(cf);
-						cf.oldCopyPath = spFile.getPath();
+						cf.oldVersionFilePath = spFile.getPath();
 					}
 					break;
 				}
