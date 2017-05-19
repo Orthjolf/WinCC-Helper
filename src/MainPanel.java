@@ -23,12 +23,11 @@ import javax.swing.border.TitledBorder;
 public class MainPanel extends JPanel {
 
 	private JFileChooser fileChooser = new JFileChooser();
-	private FileHandler fileHandler = new FileHandler();
 	private ConfigParser configParser = new ConfigParser();
-	private BubbleTooltip bubbleTooltip = new BubbleTooltip();
-
-	public ArrayList<ChangedFile> changedFiles = new ArrayList<>();
-	public ArrayList<ChangedFile> oldChangedFiles = new ArrayList<>();
+	private FileHandler filehandler = new FileHandler();
+	
+	public ArrayList<ProjectFile> changedFiles = new ArrayList<>();
+	public ArrayList<ProjectFile> oldChangedFiles = new ArrayList<>();
 	public ArrayList<String> subProjects = new ArrayList<>();
 
 	final Font btnFont = new Font("Verdana", Font.PLAIN, 20);
@@ -41,22 +40,12 @@ public class MainPanel extends JPanel {
 	public static StringBuilder log = new StringBuilder(); // Строка лога
 
 	private JPanel topPanel, bottomPanel, logPanel, centralPanel;
-	private JButton selectButton, setProjPathButton, replaceButton, deleteButton;
+	private JButton setProjPathButton;
 	private JTextArea logTextArea = new JTextArea(10, 18);
-
-	int interval = 2500; // 2.5 sec
-	Date timeToRun = new Date(System.currentTimeMillis() + interval);
-	Timer timer = new Timer();
 
 	public MainPanel() {
 		super();
 		initializePanel();
-		// Поиск измененных файлов каждый interval секунд
-		timer.schedule(new TimerTask() {
-			public void run() {
-				searchForNewerFiles();
-			}
-		}, timeToRun, interval);
 	}
 
 	void initializePanel() {
@@ -67,31 +56,11 @@ public class MainPanel extends JPanel {
 		bottomPanel.setLayout(new BorderLayout());
 		bottomPanel.setBorder(BorderFactory.createLineBorder(Color.black));
 
-		selectButton = new JButton("Выбрать все");
-		selectButton.setToolTipText("Выделить/снять выделение всех файлов списка");
-		selectButton.setFont(btnFont);
-		selectButton.setFocusable(false);
-		bottomPanel.add(selectButton, BorderLayout.LINE_START);
-		selectButton.addActionListener(selectFilesListener);
-
 		setProjPathButton = new JButton("Указать путь к проекту");
 		setProjPathButton.setFont(btnFont);
 		setProjPathButton.setFocusable(false);
 		topPanel.add(setProjPathButton, BorderLayout.CENTER);
 		setProjPathButton.addActionListener(setProjectPathListener);
-
-		replaceButton = new JButton("Заменить файлы");
-		replaceButton.setToolTipText("Замена более старых файлов, на выбранные новые");
-		replaceButton.setFont(btnFont);
-		replaceButton.setFocusable(false);
-		bottomPanel.add(replaceButton, BorderLayout.CENTER);
-		replaceButton.addActionListener(replaceFilesListener);
-
-		deleteButton = new JButton("Удалить файлы");
-		deleteButton.setFont(btnFont);
-		deleteButton.setFocusable(false);
-		bottomPanel.add(deleteButton, BorderLayout.LINE_END);
-		deleteButton.addActionListener(deleteFilesListener);
 
 		// Панель со списком
 		centralPanel = new JPanel();
@@ -122,49 +91,10 @@ public class MainPanel extends JPanel {
 		setVisible(true);
 	}
 
-	boolean checked = false; // флаг, обозначающий, выбраны и файлы
-
-	public void selectUnselectAll() {
-		if (!oldChangedFiles.isEmpty()) {
-			checked = !checked;
-			if (checked)
-				for (ChangedFile file : oldChangedFiles) {
-					file.select();
-				}
-			else
-				for (ChangedFile file : oldChangedFiles) {
-					file.unselect();
-				}
-		}
-	}
-
-	public void searchForNewerFiles() {
-		synchronized (FileHandler.listOfChangedFiles) {
-			if (mainProjectPath != "") {
-				// Очищаем список
-				fileHandler.reset();
-				changedFiles = fileHandler.getNewestFiles(mainProjectPath, subProjects);
-				if (!listsAreEquals(oldChangedFiles, changedFiles)) {
-					oldChangedFiles = changedFiles;
-					redrawPanel();
-					// Выводим всплывающую подсказку об обнаружении новых файлов
-					if (Main.inTray) {
-						filesToTooltip[0] = "Обранужены изменения в файлах проекта";
-						bubbleTooltip.addLabels(filesToTooltip);
-						bubbleTooltip.showAndHide();
-					}
-				}
-			}
-		}
-	}
-
 	public void redrawPanel() {
 		if (centralPanel.getComponentCount() > 0)
 			centralPanel.removeAll();
-
-		for (ChangedFile file : oldChangedFiles) {
-			centralPanel.add(file);
-		}
+		
 		repaint();
 		revalidate();
 	}
@@ -173,41 +103,6 @@ public class MainPanel extends JPanel {
 	public void log(StringBuilder sb) {
 		logTextArea.setText(sb.toString());
 	}
-
-	// Сравнение списков файлов
-	public boolean listsAreEquals(ArrayList<ChangedFile> a, ArrayList<ChangedFile> b) {
-		if (a.size() != b.size())
-			return false;
-		for (int i = 0; i < a.size(); i++) {
-			if (!a.get(i).equals(b.get(i)))
-				return false;
-		}
-		return true;
-	}
-
-	private ActionListener deleteFilesListener = new ActionListener() {
-		@Override
-		public void actionPerformed(ActionEvent e) {
-			if (!oldChangedFiles.isEmpty()) {
-				for (int i = 0; i < oldChangedFiles.size(); i++)
-					// Если выбран файл из списка
-					if (oldChangedFiles.get(i).checked) {
-						// Перемещаем
-						fileHandler.deleteFile(oldChangedFiles.get(i).getPath());
-					}
-				searchForNewerFiles();
-				
-				log(log);
-			}
-		}
-	};
-
-	private ActionListener selectFilesListener = new ActionListener() {
-		@Override
-		public void actionPerformed(ActionEvent e) {
-			selectUnselectAll();
-		}
-	};
 
 	private ActionListener setProjectPathListener = new ActionListener() {
 		@Override
@@ -219,27 +114,14 @@ public class MainPanel extends JPanel {
 			// панель
 			if (result == JFileChooser.APPROVE_OPTION) {
 				mainProjectPath = fileChooser.getSelectedFile().getPath();
-				log.append(" Выбран проект: " + mainProjectPath + "\n");
 				subProjects = configParser.getSubProjects(fileChooser.getSelectedFile().getPath());
-				log.append(" Найдено подпроектов: " + subProjects.size() + "\n");
-				searchForNewerFiles();
-				log(log);
-			}
-		}
-	};
-
-	private ActionListener replaceFilesListener = new ActionListener() {
-		@Override
-		public void actionPerformed(ActionEvent e) {
-			if (!oldChangedFiles.isEmpty()) {
-				for (int i = 0; i < oldChangedFiles.size(); i++)
-					// Если выбран файл из списка
-					if (oldChangedFiles.get(i).checked) {
-						// Перемещаем
-						fileHandler.moveFile(oldChangedFiles.get(i).getPath(), oldChangedFiles.get(i).oldVersionFilePath);
-					}
-				searchForNewerFiles();
-				log(log);
+		
+				DocGenerator docGenerator = new DocGenerator();
+				for(String subProject:subProjects){
+					docGenerator.generateDocumentation(subProject);
+				}
+				
+				
 			}
 		}
 	};
