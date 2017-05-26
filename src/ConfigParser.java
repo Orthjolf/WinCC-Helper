@@ -34,8 +34,4 @@ public class ConfigParser {
 		}
 		return subProjects;
 	}
-
-	public String getMainProjectPath() {
-		return mainProjectPath;
-	}
 }
