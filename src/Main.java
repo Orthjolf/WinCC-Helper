@@ -24,7 +24,6 @@ public class Main extends JFrame {
 		Main window = new Main();
 		window.add(new MainPanel());
 		window.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-
 		window.setResizable(false);
 		window.pack();
 		window.setLocationRelativeTo(null);
@@ -35,10 +34,9 @@ public class Main extends JFrame {
 	}
 
 	public Main() {
-		super("WinCC OA helper");
-		// creating instance
+		super("WinCC OA Doc generator v1.0");
+
 		try {
-			// System.out.println("setting look and feel");
 			UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
 		} catch (Exception e) {
 			System.out.println("Unable to set LookAndFeel");
@@ -47,7 +45,6 @@ public class Main extends JFrame {
 		setIconImage(Toolkit.getDefaultToolkit().getImage(getClass().getResource("icon.png")));
 
 		if (SystemTray.isSupported()) {
-			// System.out.println("system tray supported");
 			tray = SystemTray.getSystemTray();
 			Image image = Toolkit.getDefaultToolkit().getImage(getClass().getResource("icon.png"));
 
@@ -70,12 +67,12 @@ public class Main extends JFrame {
 				}
 			});
 			popup.add(defaultItem);
-			trayIcon = new TrayIcon(image, "WinCC OA file helper by Wilhelm", popup);
+			trayIcon = new TrayIcon(image, "WinCC OA Doc Generator", popup);
 			trayIcon.setImageAutoSize(true);
 		} else {
 			System.out.println("system tray not supported");
 		}
-		
+
 		addWindowStateListener(new WindowStateListener() {
 			public void windowStateChanged(WindowEvent e) {
 				if (e.getNewState() == ICONIFIED) {

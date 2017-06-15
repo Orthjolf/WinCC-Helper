@@ -7,12 +7,6 @@ import javax.swing.JOptionPane;
 
 public class ConfigParser {
 
-	String mainProjectPath;
-
-	public ConfigParser() {
-
-	}
-
 	public ArrayList<String> getSubProjects(String fileName) {
 		ArrayList<String> subProjects = new ArrayList<String>();
 		fileName += "\\config\\config";

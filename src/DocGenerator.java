@@ -3,61 +3,94 @@ import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.FileReader;
+import java.io.IOException;
 import java.io.OutputStreamWriter;
 import java.io.Writer;
 import java.util.ArrayList;
 
 public class DocGenerator {
-
 	CodeParser codeParser;
-	String textToHtml, fileTree, fileName;
+	FileHandler fileHandler;
+	String textToHtml, fileTree, fileTreeForIndex, fileName, htmlPageFullPath;
 	BufferedReader reader;
 
-	// На вход подается путь к папке, далее генерируются html файлы для каждого
-	// скрипта, xml и pnl
-	public void generateDocumentation(String folderPath) {
-		FileHandler fileHandler = new FileHandler();
-		fileHandler.getFileList(folderPath);
+	public void generateDocumentation(String sourceFolder, String documentationPath) {
+		fileHandler = new FileHandler();
+		fileHandler.getFileListFromFolder(sourceFolder);
 		ArrayList<String> listOfFiles = FileHandler.listOfFilePaths;
+
+		int filesCount = listOfFiles.size();
+		float fileShare = 100 / (float) filesCount;
+		float progress = 1;
+
+		try {
+			FileHandler.copyFolder(new File("template"), new File(documentationPath));
+		} catch (IOException e) {
+		}
+
+		fileTree = fileHandler.getTree();
+		fileTreeForIndex = fileHandler.getTreeForIndex();
+		FileHandler.clearTrees();
+
+		MainPanel.progressBar.setBounds(5, 110, 505, 25);
+		MainPanel.generateButton.setBounds(5, 160, 505, 25);
 
 		codeParser = new CodeParser();
 
-		fileTree = fileHandler.getTree();
-		for (String projFilePath : listOfFiles) {
-			textToHtml = codeParser.parseFile(projFilePath);
-			fileName = projFilePath.substring(projFilePath.lastIndexOf("\\") + 1, projFilePath.lastIndexOf("."));
-			if (textToHtml.length() > 10)
-				generateHtmlPage(projFilePath, textToHtml, "W:\\AutoDoc\\" + fileName + ".html", fileTree);
+		for (String winCCProjFile : listOfFiles) {
+			textToHtml = codeParser.parseFile(winCCProjFile);
+			fileName = winCCProjFile.substring(winCCProjFile.lastIndexOf("\\") + 1, winCCProjFile.length());
+			htmlPageFullPath = documentationPath + "\\other\\" + fileName + ".html";
+
+			MainPanel.progressBar.setValue((int) progress);
+			progress += fileShare;
+			if (progress >= 100)
+				progress = 100;
+
+			generateHtmlPage(winCCProjFile, textToHtml, htmlPageFullPath, fileTree, "template\\template.html");
 		}
+
+		MainPanel.progressBar.setBounds(5, 160, 505, 25);
+		MainPanel.generateButton.setBounds(5, 110, 505, 25);
+		MainPanel.progressBar.setValue(0);
+
+		String description = "<p>Автоматически сгенерированная документация<br>Папка: <b><a>" + sourceFolder
+				+ "</a></b></p>";
+
+		generateHtmlPage("", description, documentationPath + "\\index.html", fileTreeForIndex, "template\\index.html");
 	}
 
 	/*
 	 * Генерирует из шаблона Html страницу. Параметры:
 	 * 
-	 * @projFile - путь к файлу проекта
+	 * @winCCProjFile - путь к файлу проекта WinCC
 	 * 
 	 * @testToHtml - текст с содержимым, который встраивается в страницу
 	 * 
-	 * @genDestPath - путь, по которому сгенерируется страница
+	 * @docDestPath - путь, по которому сгенерируется страница
 	 * 
 	 * @tree - дерево файлов, которое встраивается в правый сайдбар
+	 * 
+	 * @htmlTemplatePath - шаблон, по которому генерируется документ
 	 */
-	public void generateHtmlPage(String projFile, String textToHtml, String genDestPath, String tree) {
-		System.out.println("Сгенерирован файл:\nПуть к файлу: " + projFile + "\nМесто назначения: " + genDestPath);
-		String htmlTemplatePath = "W:\\AutoDoc\\index.html";
+	public void generateHtmlPage(String winCCProjFile, String textToHtml, String docDestPath, String tree,
+			String htmlTemplatePath) {
+
+		System.out.println("Сгенерирован файл:\nПуть к файлу: " + winCCProjFile + "\nМесто назначения: " + docDestPath);
+
 		try {
 			reader = new BufferedReader(new FileReader(htmlTemplatePath));
-			File fileDir = new File(genDestPath);
+			File fileDir = new File(docDestPath);
 			Writer writer = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(fileDir), "UTF8"));
 			String line;
 			while ((line = reader.readLine()) != null) {
 				line = new String(line.getBytes(), "UTF-8");
 				line = line.trim();
 				if (line.contains("@FileName"))
-					line = line.replace("@FileName", projFile.substring(projFile.lastIndexOf("\\") + 1));
+					line = line.replace("@FileName", winCCProjFile.substring(winCCProjFile.lastIndexOf("\\") + 1));
 
 				if (line.contains("@hRef"))
-					line = line.replace("@hRef", projFile);
+					line = line.replace("@hRef", winCCProjFile);
 
 				if (line.contains("@Content"))
 					line = line.replace("@Content", textToHtml);
