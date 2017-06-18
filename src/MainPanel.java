@@ -20,12 +20,12 @@ public class MainPanel extends JPanel {
 	final Font font = new Font("Calibri", Font.PLAIN, 15);
 
 	String mainProjectPath = "";
-	String docPath = "";
+	String docuPath = "";
 
-	private JButton setProjPathButton, setDocPathButton;
+	private JButton setProjPathButton, setDocuPathButton;
 	public static JButton generateButton;
 	public static JProgressBar progressBar;
-	private JTextArea projPathTA, docPathTA, ignore;
+	private JTextArea projPathTA, docPathTA, ignoreListTA;
 	private JLabel label1;
 
 	public MainPanel() {
@@ -44,7 +44,7 @@ public class MainPanel extends JPanel {
 	void initializePanel() {
 		setLayout(null);
 
-		setProjPathButton = new JButton("Указать путь к проекту");
+		setProjPathButton = new JButton("Пусть к проекту WinCC");
 		setProjPathButton.setFont(font);
 		setProjPathButton.setFocusable(false);
 		setProjPathButton.setBounds(leftColumnX, 5, elWidth, elHeight);
@@ -59,12 +59,12 @@ public class MainPanel extends JPanel {
 		projPathTA.setBorder(BorderFactory.createLineBorder(Color.BLACK));
 		add(projPathTA);
 
-		setDocPathButton = new JButton("Путь для генерации");
-		setDocPathButton.setFont(font);
-		setDocPathButton.setFocusable(false);
-		setDocPathButton.setBounds(leftColumnX, 35, elWidth, elHeight);
-		setDocPathButton.addActionListener(setDocPathListener);
-		add(setDocPathButton);
+		setDocuPathButton = new JButton("Сгенерировать в...");
+		setDocuPathButton.setFont(font);
+		setDocuPathButton.setFocusable(false);
+		setDocuPathButton.setBounds(leftColumnX, 35, elWidth, elHeight);
+		setDocuPathButton.addActionListener(setDocPathListener);
+		add(setDocuPathButton);
 
 		docPathTA = new JTextArea("");
 		docPathTA.setEditable(false);
@@ -86,12 +86,12 @@ public class MainPanel extends JPanel {
 		label1.setBounds(10, 60, elWidth, 25);
 		add(label1);
 
-		ignore = new JTextArea(".svn, dplist, colorDB, pictures");
-		ignore.setEditable(true);
-		ignore.setBounds(rightColumnX, 65, elWidth, 40);
-		ignore.setBorder(BorderFactory.createLineBorder(Color.BLACK));
-		ignore.setFont(font);
-		add(ignore);
+		ignoreListTA = new JTextArea(".svn, dplist, colorDB, pictures");
+		ignoreListTA.setEditable(true);
+		ignoreListTA.setBounds(rightColumnX, 65, elWidth, 40);
+		ignoreListTA.setBorder(BorderFactory.createLineBorder(Color.BLACK));
+		ignoreListTA.setFont(font);
+		add(ignoreListTA);
 
 		progressBar = new JProgressBar();
 		progressBar.setStringPainted(true);
@@ -124,8 +124,8 @@ public class MainPanel extends JPanel {
 			int result = fileChooser.showDialog(null, "Указать путь генерации");
 
 			if (result == JFileChooser.APPROVE_OPTION) {
-				docPath = fileChooser.getSelectedFile().getPath();
-				docPathTA.setText(docPath);
+				docuPath = fileChooser.getSelectedFile().getPath();
+				docPathTA.setText(docuPath);
 			}
 		}
 	};
@@ -135,9 +135,9 @@ public class MainPanel extends JPanel {
 		public void actionPerformed(ActionEvent e) {
 			// Запускаем функцию в новом потоке, чтоб обновлялся прогрессбар
 			new Thread(() -> {
-				if (!docPath.isEmpty() || !mainProjectPath.isEmpty()) {
-					FileHandler.ignoreFolderList = ignore.getText().replaceAll(" ", "").split(",");
-					new DocGenerator().generateDocumentation(mainProjectPath, docPath);
+				if (!docuPath.isEmpty() || !mainProjectPath.isEmpty()) {
+					FileHandler.ignoredFolderList = ignoreListTA.getText().replaceAll(" ", "").split(",");
+					new HtmlGenerator().generateDocumentation(mainProjectPath, docuPath);
 				}
 			}).start();
 		}

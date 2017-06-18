@@ -6,7 +6,7 @@ import java.util.ArrayList;
 import javax.swing.JOptionPane;
 
 public class ConfigParser {
-
+	// Легаси код. Не используется.
 	public ArrayList<String> getSubProjects(String fileName) {
 		ArrayList<String> subProjects = new ArrayList<String>();
 		fileName += "\\config\\config";

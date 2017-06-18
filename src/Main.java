@@ -16,30 +16,29 @@ import javax.swing.UIManager;
 public class Main extends JFrame {
 
 	private static final long serialVersionUID = 1L;
+	public static boolean inTray = false;
+
 	TrayIcon trayIcon;
 	SystemTray tray;
-	public static boolean inTray = false;
 
 	public static void main(String[] args) {
 		Main window = new Main();
+		Dimension screen = Toolkit.getDefaultToolkit().getScreenSize();
 		window.add(new MainPanel());
 		window.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		window.setResizable(false);
 		window.pack();
 		window.setLocationRelativeTo(null);
-
-		Dimension screen = Toolkit.getDefaultToolkit().getScreenSize();
 		window.setLocation(screen.width / 4, screen.height / 4);
 		window.setVisible(true);
 	}
 
 	public Main() {
-		super("WinCC OA Doc generator v1.0");
+		super("WinCC OA DocuGen v1.0");
 
 		try {
 			UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
 		} catch (Exception e) {
-			System.out.println("Unable to set LookAndFeel");
 		}
 
 		setIconImage(Toolkit.getDefaultToolkit().getImage(getClass().getResource("icon.png")));

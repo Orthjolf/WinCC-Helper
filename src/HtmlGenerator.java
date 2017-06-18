@@ -8,18 +8,25 @@ import java.io.OutputStreamWriter;
 import java.io.Writer;
 import java.util.ArrayList;
 
-public class DocGenerator {
+public class HtmlGenerator {
+	
+	
+	
+	
+	
+	
 	CodeParser codeParser;
 	FileHandler fileHandler;
 	String textToHtml, fileTree, fileTreeForIndex, fileName, htmlPageFullPath;
 	BufferedReader reader;
-
+	
 	public void generateDocumentation(String sourceFolder, String documentationPath) {
 		fileHandler = new FileHandler();
 		fileHandler.getFileListFromFolder(sourceFolder);
-		ArrayList<String> listOfFiles = FileHandler.listOfFilePaths;
+		ArrayList<String> listOfWinCCFiles = FileHandler.listOfWinCCFiles;
 
-		int filesCount = listOfFiles.size();
+		// progress bar stuff
+		int filesCount = listOfWinCCFiles.size();
 		float fileShare = 100 / (float) filesCount;
 		float progress = 1;
 
@@ -37,17 +44,18 @@ public class DocGenerator {
 
 		codeParser = new CodeParser();
 
-		for (String winCCProjFile : listOfFiles) {
-			textToHtml = codeParser.parseFile(winCCProjFile);
-			fileName = winCCProjFile.substring(winCCProjFile.lastIndexOf("\\") + 1, winCCProjFile.length());
-			htmlPageFullPath = documentationPath + "\\other\\" + fileName + ".html";
+		for (int i = 0; i < listOfWinCCFiles.size(); i++) {
+			textToHtml = codeParser.parseFile(listOfWinCCFiles.get(i));
+			fileName = listOfWinCCFiles.get(i).substring(listOfWinCCFiles.get(i).lastIndexOf("\\") + 1);
+			htmlPageFullPath = documentationPath + "\\other\\" + FileHandler.listOfNames.get(i) + ".html";
 
 			MainPanel.progressBar.setValue((int) progress);
 			progress += fileShare;
 			if (progress >= 100)
 				progress = 100;
 
-			generateHtmlPage(winCCProjFile, textToHtml, htmlPageFullPath, fileTree, "template\\template.html");
+			generateHtmlPage(listOfWinCCFiles.get(i), textToHtml, htmlPageFullPath, fileTree,
+					"template\\template.html");
 		}
 
 		MainPanel.progressBar.setBounds(5, 160, 505, 25);
@@ -76,7 +84,8 @@ public class DocGenerator {
 	public void generateHtmlPage(String winCCProjFile, String textToHtml, String docDestPath, String tree,
 			String htmlTemplatePath) {
 
-		System.out.println("Сгенерирован файл:\nПуть к файлу: " + winCCProjFile + "\nМесто назначения: " + docDestPath);
+		// System.out.println("Сгенерирован файл:\nПуть к файлу: " +
+		// winCCProjFile + "\nМесто назначения: " + docDestPath);
 
 		try {
 			reader = new BufferedReader(new FileReader(htmlTemplatePath));

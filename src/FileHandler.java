@@ -8,59 +8,79 @@ import java.util.ArrayList;
 
 public class FileHandler {
 
-	// Список всех файлов проекта
-	static ArrayList<String> listOfFilePaths = new ArrayList<>();
+	static ArrayList<String> listOfWinCCFiles = new ArrayList<>();
+	static ArrayList<String> listOfNames = new ArrayList<>();
 	static String treeStructure, treeStructureForIndex;
 
-	public static StringBuilder treeBuilder = new StringBuilder();
-	public static StringBuilder treeBuilderForIndex = new StringBuilder();
-	public static String ignoreFolderList[] = null;
+	static int k = 0;
+
+	public static StringBuilder fileTree = new StringBuilder();
+	public static StringBuilder fileTreeForIndex = new StringBuilder();
+
+	public static String ignoredFolderList[] = null;
 	private String extensionList[] = { ".xml", ".pnl", ".ctl" };
 
 	// Функция возвращает пути ко всем файлам в папке
 	// Формирует дерево файлов
 	public ArrayList<String> getFileListFromFolder(String directory) {
-		File dir = new File(directory);
+		File folder = new File(directory);
 		String relativePath = directory.substring(directory.lastIndexOf("\\") + 1);
-		treeBuilder.append("<li><a href=\"\">" + relativePath + "</a>\n<ul>\n");
-		treeBuilderForIndex.append("<li><a href=\"\">" + relativePath + "</a>\n<ul>\n");
 
-		if (dir.list().length != 0) { // если папка не пустая
+		fileTree.append("<li><a href=\"\">" + relativePath + "</a>\n<ul>\n");
+		fileTreeForIndex.append("<li><a href=\"\">" + relativePath + "</a>\n<ul>\n");
+
+		if (folder.list().length != 0) {
 			boolean ignoreFolder;
-			for (File item : dir.listFiles()) {
+			for (File file : folder.listFiles()) {
 				ignoreFolder = false;
-				if (item.isDirectory()) {
-					for (String folderName : ignoreFolderList) {
-						if (folderName.startsWith(item.getName())) {
+				if (file.isDirectory()) {
+					for (String ignoredFolder : ignoredFolderList) {
+						if (ignoredFolder.startsWith(file.getName())) {
 							ignoreFolder = true;
 						}
 					}
 					if (!ignoreFolder)
-						getFileListFromFolder(item.getPath());
+						getFileListFromFolder(file.getPath());
 				} else {
-					relativePath = item.getName();
+					relativePath = file.getName();
 					for (String extension : extensionList)
 						if (relativePath.endsWith(extension)) {
-							listOfFilePaths.add(item.getPath());
-							treeBuilder.append(
-									"<li><a href=\"" + relativePath + ".html\">" + relativePath + "</a></li>\n");
-							treeBuilderForIndex.append(
-									"<li><a href=\"other\\" + relativePath + ".html\">" + relativePath + "</a></li>\n");
+							listOfWinCCFiles.add(file.getPath());
+
+							String fixedName = fixName(file.getName());
+
+							listOfNames.add(fixedName);
+
+							fileTree.append("<li><a href=\"" + fixedName + ".html\">" + relativePath + "</a></li>\n");
+							fileTreeForIndex.append(
+									"<li><a href=\"other\\" + fixedName + ".html\">" + relativePath + "</a></li>\n");
 						}
 				}
-				ignoreFolder = false;
 			}
 		}
-		treeBuilder.append("</ul>\n</li>");
-		treeBuilderForIndex.append("</ul>\n</li>");
-		treeStructure = treeBuilder.toString();
-		treeStructureForIndex = treeBuilderForIndex.toString();
-		return listOfFilePaths;
+		fileTree.append("</ul>\n</li>");
+		fileTreeForIndex.append("</ul>\n</li>");
+		treeStructure = fileTree.toString();
+		treeStructureForIndex = fileTreeForIndex.toString();
+		return listOfWinCCFiles;
+	}
+
+	private String fixName(String name) {
+		for (String fileName : listOfNames) {
+			if (fileName.equals(name)) {
+				System.out.print("Файл " + name + " повторяется,");
+				name = name.replace(".ctl", "_" + k + ".ctl");
+				name = name.replace(".pnl", "_" + k + ".pnl");
+				name = name.replace(".xml", "_" + k + ".xml");
+				k++;
+			}
+		}
+		return name;
 	}
 
 	public static void clearTrees() {
-		treeBuilder = new StringBuilder();
-		treeBuilderForIndex = new StringBuilder();
+		fileTree = new StringBuilder();
+		fileTreeForIndex = new StringBuilder();
 	}
 
 	public static void copyFolder(File src, File dest) throws IOException {
@@ -68,7 +88,8 @@ public class FileHandler {
 		if (src.isDirectory()) {
 			if (!dest.exists()) {
 				dest.mkdir();
-				System.out.println("Файл скопирован из " + src + " в " + dest);
+				// System.out.println("Файл скопирован из " + src + " в " +
+				// dest);
 			}
 
 			String files[] = src.list();
@@ -92,7 +113,7 @@ public class FileHandler {
 
 			in.close();
 			out.close();
-			System.out.println("Файл скопирован " + src + " в " + dest);
+			// System.out.println("Файл скопирован " + src + " в " + dest);
 		}
 	}
 

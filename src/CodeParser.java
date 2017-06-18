@@ -3,12 +3,15 @@ import java.io.FileReader;
 import java.io.IOException;
 
 public class CodeParser {
+
+	private BufferedReader reader;
+
 	public String parseFile(String projFile) {
 
 		boolean readingComment = false;
 		boolean readingFunction = false;
 		StringBuilder textToHtml = new StringBuilder();
-		BufferedReader reader;
+
 		String function = "";
 		try {
 			reader = new BufferedReader(new FileReader(projFile));
