@@ -7,61 +7,60 @@
 <script type="text/javascript" src="js/cufon-yui.js"></script>
 <script type="text/javascript" src="js/arial.js"></script>
 <script type="text/javascript" src="js/cuf_run.js"></script>
-<script type="text/javascript" src="js/enhance.js"></script>		
+<script type="text/javascript" src="js/enhance.js"></script>
+<script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1/jquery.min.js"></script>
 <script type="text/javascript">
-	enhance({
-		loadScripts: [
-			'https://ajax.googleapis.com/ajax/libs/jquery/1.8.3/jquery.min.js',
-			'js/jQuery.tree.js',
-			'js/example.js'
-		],
-		loadStyles: ['css/enhanced.css'],
-		forcePassText: ['Посмотреть с подключенными скриптами'],
-		forceFailText: ['Посмотреть с выключенными скриптами']
-	});   
-</script>		
-</head>
+enhance({
+loadScripts: [
+'js/jQuery.tree.js',
+'js/example.js'
+],
+loadStyles: ['css/enhanced.css'],
+});
+</script>
+<script type="text/javascript">
+function openPage(href) {
+document.getElementById('myFrame').src = href;
+document.getElementById('myFrame').height = '10000';
+}
+</script>
 <body>
-<div class="main">
-  <div class="header">
-    <div class="header_resize">
-      <div class="logo">
-        <h1><a href="index.html"><img src="images/scadtech.jpg" alt="ScadTech"><small>Документация проекта</small></h1>
-      </div>
-      <div class="clr"></div>
-      <div class="menu_nav">
-      </div>
-      <div class="clr"></div>
-    </div>
-  </div>
-  <div class="clr"></div>
-  <div class="content">
-    <div class="content_resize">
-      <div class="mainbar">
-        <div class="article">
-          <h2><a href="@hRef">WinCC AutoDoc v1.0</a></h2>
-		  <hr>
-          <div class="clr"></div>
-          @Content
-        </div>
-      </div>
-      <div class="sidebar">
-		<div class="gadget">
-          <h2>Список Файлов</h2><hr>
-		  <ul id="files">
-			@Tree		
-		  </ul>
-        </div>
-      </div>
-      <div class="clr"></div>
-    </div>
-  </div>
-  <div class="fbg">
-    <div class="footer">
-      <p class="lr">Copyright &copy; <a href="#">ScadTech</a>. All Rights Reserved</p>
-      <div class="clr"></div>
-    </div>
-  </div>
-</div>
+	<div class="main">
+		<div class="header">
+			<div class="header_resize">
+				<div class="logo">
+					<h1><a href="index.html"><img src="images/scadtech.jpg" alt="ScadTech"><small>Документация проекта</small></h1>
+				</div>
+				<div class="clr"></div>
+					<div class="menu_nav">
+				</div>
+				<div class="clr"></div>
+			</div>
+		</div>
+		<div class="clr"></div>
+			<div class="content">
+				<div class="content_resize">
+					<div class="mainbar">
+						<div class="article">
+							<h2><a href="">WinCC AutoDoc v1.0</a></h2>
+							<hr>
+							<div class="clr"></div>
+								<p>Автоматически сгeнерированная документация<br>Папка: <b><a>@Folder</a></b></p>
+							</div>
+							<iframe id="myFrame" style="border:1px dashed #ddd;" width="650" height="0" scrolling="no" src=""></iframe>
+						</div>
+						<div class="sidebar">
+							<div class="gadget">
+								<h2>Список Файлов</h2><hr>
+								<ul id="files">
+									@Tree
+								</ul>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
 </body>
 </html>

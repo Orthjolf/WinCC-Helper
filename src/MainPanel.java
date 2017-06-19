@@ -136,7 +136,7 @@ public class MainPanel extends JPanel {
 			// Запускаем функцию в новом потоке, чтоб обновлялся прогрессбар
 			new Thread(() -> {
 				if (!docuPath.isEmpty() || !mainProjectPath.isEmpty()) {
-					FileHandler.ignoredFolderList = ignoreListTA.getText().replaceAll(" ", "").split(",");
+					HtmlGenerator.ignoredFolderList = ignoreListTA.getText().replaceAll(" ", "").split(",");
 					new HtmlGenerator().generateDocumentation(mainProjectPath, docuPath);
 				}
 			}).start();
