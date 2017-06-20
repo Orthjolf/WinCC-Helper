@@ -28,7 +28,9 @@ public class HtmlGenerator {
 
 	private CodeParser codeParser;
 
+	
 	public void generateDocumentation(String sourceFolder, String documentationPath) {
+		
 		String textToHtml, htmlPageFullPath;
 		generateConfig(sourceFolder);
 
@@ -69,6 +71,7 @@ public class HtmlGenerator {
 		Toolkit.getDefaultToolkit().beep();
 	}
 
+	
 	/*
 	 * Генерирует из шаблона Html страницу. Параметры:
 	 * 
@@ -107,6 +110,7 @@ public class HtmlGenerator {
 		}
 	}
 
+	
 	public void generateIndexPage(String winCCProjFile, String docDestPath, String tree) {
 
 		BufferedReader reader;
@@ -142,8 +146,10 @@ public class HtmlGenerator {
 			e.printStackTrace();
 		}
 	}
+	
 
 	public void generateConfig(String directory) {
+		
 		File folder = new File(directory);
 		String relativePath = folder.getName();
 
@@ -180,21 +186,21 @@ public class HtmlGenerator {
 		fileTree.append("</ul>\n</li>");
 	}
 
+	
 	public static void resetStaticVariables() {
+		
 		fileTree = new StringBuilder();
 		listOfWinCCFiles = new ArrayList<>();
 		listOfNames = new ArrayList<>();
 		justCountForNames = 0;
 	}
 
+	
 	public void copyFolder(File src, File dest) throws IOException {
 
 		if (src.isDirectory()) {
-			if (!dest.exists()) {
+			if (!dest.exists())
 				dest.mkdir();
-				// System.out.println("Файл скопирован из " + src + " в " +
-				// dest);
-			}
 
 			String files[] = src.list();
 
@@ -211,13 +217,11 @@ public class HtmlGenerator {
 
 			int length;
 
-			while ((length = in.read(buffer)) > 0) {
+			while ((length = in.read(buffer)) > 0)
 				out.write(buffer, 0, length);
-			}
 
 			in.close();
 			out.close();
-			// System.out.println("Файл скопирован " + src + " в " + dest);
 		}
 	}
 }

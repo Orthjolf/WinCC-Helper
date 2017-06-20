@@ -91,7 +91,7 @@ public class MainPanel extends JPanel {
 		justText.setBounds(10, 60, elWidth, 25);
 		add(justText);
 
-		ignoreListTA = new JTextField(".svn, dplist, colorDB, pictures, images");
+		ignoreListTA = new JTextField(".svn, dplist, colorDB, pictures, images, config");
 		ignoreListTA.setEditable(true);
 		ignoreListTA.setBounds(rightColumnX, 65, elWidth, 40);
 		ignoreListTA.setBorder(BorderFactory.createLineBorder(Color.BLACK));
