@@ -34,7 +34,7 @@ public class Main extends JFrame {
 	}
 
 	public Main() {
-		super("WinCC OA DocuGen v1.0");
+		super("WinCC OA DocuGen v1.1");
 
 		try {
 			UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());

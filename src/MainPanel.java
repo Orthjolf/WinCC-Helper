@@ -11,6 +11,7 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JProgressBar;
 import javax.swing.JTextArea;
+import javax.swing.JTextField;
 
 @SuppressWarnings("serial")
 public class MainPanel extends JPanel {
@@ -19,14 +20,14 @@ public class MainPanel extends JPanel {
 
 	final Font font = new Font("Calibri", Font.PLAIN, 15);
 
-	String mainProjectPath = "";
-	String docuPath = "";
+	String winCCProjectPath;
+	String documentationPath;
 
 	private JButton setProjPathButton, setDocuPathButton;
 	public static JButton generateButton;
 	public static JProgressBar progressBar;
-	private JTextArea projPathTA, docPathTA, ignoreListTA;
-	private JLabel label1;
+	private JTextField projPathTA, docPathTA, ignoreListTA;
+	private JLabel justText;
 
 	public MainPanel() {
 		super();
@@ -44,6 +45,9 @@ public class MainPanel extends JPanel {
 	void initializePanel() {
 		setLayout(null);
 
+		winCCProjectPath=System.getProperty("user.dir");
+		documentationPath=System.getProperty("user.dir")+"\\Docu!";
+		
 		setProjPathButton = new JButton("Пусть к проекту WinCC");
 		setProjPathButton.setFont(font);
 		setProjPathButton.setFocusable(false);
@@ -51,27 +55,29 @@ public class MainPanel extends JPanel {
 		setProjPathButton.addActionListener(setProjectPathListener);
 		add(setProjPathButton, BorderLayout.LINE_START);
 
-		projPathTA = new JTextArea("");
-		projPathTA.setEditable(false);
+		projPathTA = new JTextField("");
+		projPathTA.setEditable(true);
 		projPathTA.setSize(50, 20);
 		projPathTA.setFont(font);
 		projPathTA.setBounds(rightColumnX, 5, elWidth, elHeight);
 		projPathTA.setBorder(BorderFactory.createLineBorder(Color.BLACK));
+		projPathTA.setText(winCCProjectPath);
 		add(projPathTA);
 
-		setDocuPathButton = new JButton("Сгенерировать в...");
+		setDocuPathButton = new JButton("Сгенерировать в..");
 		setDocuPathButton.setFont(font);
 		setDocuPathButton.setFocusable(false);
 		setDocuPathButton.setBounds(leftColumnX, 35, elWidth, elHeight);
 		setDocuPathButton.addActionListener(setDocPathListener);
 		add(setDocuPathButton);
 
-		docPathTA = new JTextArea("");
-		docPathTA.setEditable(false);
+		docPathTA = new JTextField("");
+		docPathTA.setEditable(true);
 		docPathTA.setSize(50, 20);
 		docPathTA.setFont(font);
 		docPathTA.setBorder(BorderFactory.createLineBorder(Color.BLACK));
 		docPathTA.setBounds(rightColumnX, 35, elWidth, elHeight);
+		docPathTA.setText(documentationPath);
 		add(docPathTA);
 
 		generateButton = new JButton("Сгенерировать");
@@ -81,12 +87,12 @@ public class MainPanel extends JPanel {
 		generateButton.addActionListener(generateDocListener);
 		add(generateButton);
 
-		label1 = new JLabel("Ингорировать папки:");
-		label1.setFont(font);
-		label1.setBounds(10, 60, elWidth, 25);
-		add(label1);
+		justText = new JLabel("Ингорировать папки:");
+		justText.setFont(font);
+		justText.setBounds(10, 60, elWidth, 25);
+		add(justText);
 
-		ignoreListTA = new JTextArea(".svn, dplist, colorDB, pictures");
+		ignoreListTA = new JTextField(".svn, dplist, colorDB, pictures, images");
 		ignoreListTA.setEditable(true);
 		ignoreListTA.setBounds(rightColumnX, 65, elWidth, 40);
 		ignoreListTA.setBorder(BorderFactory.createLineBorder(Color.BLACK));
@@ -110,8 +116,8 @@ public class MainPanel extends JPanel {
 			int result = fileChooser.showDialog(null, "Открыть проект");
 
 			if (result == JFileChooser.APPROVE_OPTION) {
-				mainProjectPath = fileChooser.getSelectedFile().getPath();
-				projPathTA.setText(mainProjectPath);
+				winCCProjectPath = fileChooser.getSelectedFile().getPath();
+				projPathTA.setText(winCCProjectPath);
 			}
 		}
 	};
@@ -124,8 +130,8 @@ public class MainPanel extends JPanel {
 			int result = fileChooser.showDialog(null, "Указать путь генерации");
 
 			if (result == JFileChooser.APPROVE_OPTION) {
-				docuPath = fileChooser.getSelectedFile().getPath();
-				docPathTA.setText(docuPath);
+				documentationPath = fileChooser.getSelectedFile().getPath();
+				docPathTA.setText(documentationPath);
 			}
 		}
 	};
@@ -135,9 +141,9 @@ public class MainPanel extends JPanel {
 		public void actionPerformed(ActionEvent e) {
 			// Запускаем функцию в новом потоке, чтоб обновлялся прогрессбар
 			new Thread(() -> {
-				if (!docuPath.isEmpty() || !mainProjectPath.isEmpty()) {
+				if (!documentationPath.isEmpty() && !winCCProjectPath.isEmpty()) {
 					HtmlGenerator.ignoredFolderList = ignoreListTA.getText().replaceAll(" ", "").split(",");
-					new HtmlGenerator().generateDocumentation(mainProjectPath, docuPath);
+					new HtmlGenerator().generateDocumentation(winCCProjectPath, documentationPath);
 				}
 			}).start();
 		}

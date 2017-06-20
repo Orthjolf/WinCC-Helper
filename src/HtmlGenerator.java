@@ -1,3 +1,4 @@
+import java.awt.Toolkit;
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.File;
@@ -9,6 +10,8 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.io.Writer;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 
 public class HtmlGenerator {
@@ -28,7 +31,7 @@ public class HtmlGenerator {
 	public void generateDocumentation(String sourceFolder, String documentationPath) {
 		String textToHtml, htmlPageFullPath;
 		generateConfig(sourceFolder);
-	
+
 		// progress bar stuff
 		int filesCount = listOfWinCCFiles.size();
 		float fileShare = 100 / (float) filesCount;
@@ -53,16 +56,17 @@ public class HtmlGenerator {
 			if (progress >= 100)
 				progress = 100;
 
-			generateHtmlPage(listOfWinCCFiles.get(i), textToHtml, htmlPageFullPath, "template\\template.html");
+			generateHtmlPage(listOfWinCCFiles.get(i), textToHtml, htmlPageFullPath);
 		}
 
 		MainPanel.progressBar.setBounds(5, 160, 505, 25);
 		MainPanel.generateButton.setBounds(5, 110, 505, 25);
 		MainPanel.progressBar.setValue(0);
 
-
 		generateIndexPage(sourceFolder, documentationPath + "\\index.html", fileTree.toString());
 		resetStaticVariables();
+
+		Toolkit.getDefaultToolkit().beep();
 	}
 
 	/*
@@ -73,27 +77,23 @@ public class HtmlGenerator {
 	 * @testToHtml - текст с содержимым, который встраивается в страницу
 	 * 
 	 * @docDestPath - путь, по которому сгенерируется страница
-	 * 
-	 * @htmlTemplatePath - шаблон, по которому генерируется документ
 	 */
-	public void generateHtmlPage(String winCCProjFile, String textToHtml, String docDestPath, String htmlTemplatePath) {
 
-		// System.out.println("Сгенерирован файл:\nПуть к файлу: " +
-		// winCCProjFile + "\nМесто назначения: " + docDestPath);
+	public void generateHtmlPage(String winCCProjFile, String textToHtml, String docDestPath) {
+
 		BufferedReader reader;
 		try {
-			reader = new BufferedReader(new FileReader(htmlTemplatePath));
+			reader = new BufferedReader(new FileReader("template\\template.html"));
 			File fileDir = new File(docDestPath);
 			Writer writer = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(fileDir), "UTF8"));
 			String line;
 			while ((line = reader.readLine()) != null) {
 				line = new String(line.getBytes(), "UTF-8");
 				line = line.trim();
-				if (line.contains("@FileName"))
-					line = line.replace("@FileName", winCCProjFile.substring(winCCProjFile.lastIndexOf("\\") + 1));
 
 				if (line.contains("@hRef"))
-					line = line.replace("@hRef", winCCProjFile);
+					line = line.replace("@hRef", "<a href=\"" + winCCProjFile + "\">"
+							+ winCCProjFile.substring(winCCProjFile.lastIndexOf("\\") + 1) + "</a>");
 
 				if (line.contains("@Content"))
 					line = line.replace("@Content", textToHtml);
@@ -109,13 +109,15 @@ public class HtmlGenerator {
 
 	public void generateIndexPage(String winCCProjFile, String docDestPath, String tree) {
 
-		// System.out.println("Сгенерирован файл:\nПуть к файлу: " +
-		// winCCProjFile + "\nМесто назначения: " + docDestPath);
 		BufferedReader reader;
 		try {
-			reader = new BufferedReader(new FileReader("template//index.html"));
+			reader = new BufferedReader(new FileReader("template\\index.html"));
 			File fileDir = new File(docDestPath);
 			Writer writer = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(fileDir), "UTF8"));
+
+			DateTimeFormatter dtf = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm:ss");
+			LocalDateTime now = LocalDateTime.now();
+
 			String line;
 			while ((line = reader.readLine()) != null) {
 				line = new String(line.getBytes(), "UTF-8");
@@ -124,7 +126,11 @@ public class HtmlGenerator {
 				if (line.contains("@Folder")) {
 					line = line.replace("@Folder", winCCProjFile);
 				}
-				
+
+				if (line.contains("@Date")) {
+					line = line.replace("@Date", dtf.format(now));
+				}
+
 				if (line.contains("@Tree")) {
 					line = line.replace("@Tree", tree);
 				}
@@ -161,12 +167,12 @@ public class HtmlGenerator {
 						if (relativePath.endsWith(extension)) {
 							listOfWinCCFiles.add(file.getPath());
 
-							String fixedName = "html_"+justCountForNames+"_"+(file.getName());
+							String htmlFileName = "html_" + justCountForNames + "_" + (file.getName());
 							justCountForNames++;
-							listOfNames.add(fixedName);
+							listOfNames.add(htmlFileName);
 
-							fileTree.append(
-									"<li><a href=\"#\" onclick = openPage('other/" + fixedName + ".html')>" + relativePath + "</a></li>\n");
+							fileTree.append("<li><a href=\"#\" onclick = openPage('other/" + htmlFileName + ".html')>"
+									+ relativePath + "</a></li>\n");
 						}
 				}
 			}
